@@ -1,0 +1,38 @@
+name: build and deploy runner github
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  VERSION_DOCKER: ${{vars.VERSION_DOCKER}}
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      #- name: build de docker sin action
+      #  run: |
+      #    docker build -t mi-runner-de-github:${{ env.VERSION_DOCKER }} .
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          tags: mi-runner-de-github:${{ env.VERSION_DOCKER }}
+
+      - name: Verify image
+        run: |
+            docker images
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      
